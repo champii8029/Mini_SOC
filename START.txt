@@ -1,0 +1,4 @@
+cd E:\IA\mini_soc
+python main.py
+
+E:\IA\mini_soc\static\index.html

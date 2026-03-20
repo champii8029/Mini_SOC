@@ -1,0 +1,16 @@
+# === SECRETOS (NUNCA SUBIR) ===
+.env
+*.db
+
+# === Python Cache ===
+__pycache__/
+venv/
+*.pyc
+
+# === Logs Operativos ===
+*.log
+
+# === Windows Basura ===
+*.bat
+Thumbs.db
+desktop.ini

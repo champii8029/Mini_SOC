@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShGlobal SOC Dashboard</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css">
+    <!-- FontAwesome & Chart.js -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="dashboard">
+        <aside class="sidebar">
+            <div class="logo">
+                <img src="../logo.png" alt="ShGlobal Logo" id="brandLogo" onerror="this.onerror=null; this.src='https://via.placeholder.com/40';">
+                <span>ShGlobal <strong>SOC</strong></span>
+            </div>
+            <nav id="mainNav">
+                <a href="#" class="active" data-view="dashboard-view"><i class="fa-solid fa-chart-line"></i> Dashboard</a>
+                <a href="#" data-view="activos-view"><i class="fa-solid fa-triangle-exclamation"></i> Activos (Windows)</a>
+                <a href="#" data-view="firewall-view"><i class="fa-solid fa-fire-extinguisher"></i> Firewall (Fortinet)</a>
+                <a href="#" data-view="forward-view"><i class="fa-solid fa-route"></i> Vigilancia de Tráfico</a>
+            </nav>
+        </aside>
+        
+        <main class="content">
+            <header>
+                <h1 id="pageTitle">Monitoreo de Seguridad en Tiempo Real</h1>
+                <div class="status">
+                    <span class="dot active"></span> Backend En Línea
+                </div>
+            </header>
+            
+            <!-- VISTA: DASHBOARD -->
+            <div id="dashboard-view" class="view-section active-view">
+                <div class="metrics">
+                    <div class="card metric metric-blue">
+                        <h3 style="color: #334155; font-size: 12px; font-weight: 700;">Eventos Ciberguridad (Última Hora)</h3>
+                        <div class="value critical" id="topMetricEventos" style="color: var(--primary);">0</div>
+                    </div>
+                    <div class="card metric metric-orange">
+                        <h3 style="font-size: 11px;">Alertas Activas (Críticas)</h3>
+                        <div class="value" id="topMetricAlertas" style="color: var(--danger);">0</div>
+                    </div>
+                    <div class="card metric metric-red">
+                        <h3 style="color: #334155; font-size: 12px; font-weight: 700;">Activos en Red</h3>
+                        <div class="value success" id="topMetricActivos" style="color: var(--success);">0</div>
+                    </div>
+                </div>
+
+                <div class="card panel alerts-panel" style="margin-top: 25px; min-height: 400px;">
+                    <div class="panel-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h2><i class="fa-solid fa-bolt" style="color: var(--warning); font-size: 24px; margin-right: 10px;"></i> Centro de Incidentes & Alertas Automáticas (SOAR)</h2>
+                        <input type="text" id="searchAlerts" placeholder="🔍 Buscar alerta..." class="input-light" style="width: 250px; padding: 8px 15px; border-radius: 6px;">
+                    </div>
+                    <div class="table-container" style="margin-top: 20px;">
+                        <table id="alertsTable">
+                            <thead>
+                                <tr>
+                                    <th>Fecha y Hora</th>
+                                    <th>Severidad</th>
+                                    <th>Descripción Detallada de Amenaza</th>
+                                    <th>Estado / Mitigación SOAR</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <!-- Inyectado por JS -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div> <!-- End Dashboard View -->
+
+            <!-- VISTA: ACTIVOS -->
+            <div id="activos-view" class="view-section" style="display: none;">
+                <div class="card panel fade-in">
+                    <h2><i class="fa-brands fa-windows" style="color: #60a5fa; font-size: 24px; margin-right: 10px;"></i> Inventario de Activos (Windows)</h2>
+                    <br>
+                    <p style="color: var(--text-muted); line-height: 1.6;">
+                        Gestión de los segmentos <strong>192.168.0.0/24 - 192.168.4.0/24</strong>.
+                    </p>
+                    
+                    <div style="margin-top: 25px; display: flex; gap: 10px; align-items: center; flex-wrap: wrap;">
+                        <button id="btnScan" class="btn-primary"><i class="fa-solid fa-radar"></i> Iniciar Barrido de Red</button>
+                        <button id="btnExport" class="btn-success"><i class="fa-solid fa-file-excel"></i> Exportar Excel</button>
+                        <button id="btnPdf" class="btn-danger"><i class="fa-solid fa-file-pdf"></i> Generar PDF</button>
+                        <div style="flex-grow: 1;"></div>
+                        <input type="text" id="searchHosts" placeholder="🔍 Buscar IP o estado..." class="input-light">
+                    </div>
+
+                    <div id="scanProgress" style="display: none; margin-top: 25px;">
+                        <span style="font-size: 13px; color: var(--text-muted); font-weight: 600;">Escaneando subredes concurrentemente... <span id="scanPercent">0</span>%</span>
+                        <div class="progress-bar-container">
+                            <div class="progress-bar" id="scanBar"></div>
+                        </div>
+                    </div>
+
+                    <div class="table-container fade-in" style="margin-top: 35px;">
+                        <table id="hostsTable">
+                            <thead>
+                                <tr>
+                                    <th>IP Descubierta</th>
+                                    <th>Estado</th>
+                                    <th>Última Vez Visto</th>
+                                    <th>Acción</th>
+                                </tr>
+                            </thead>
+                            <tbody id="hostsBody">
+                                <!-- JS Injected -->
+                                <tr><td colspan="4" style="text-align:center; color: #6b7280; padding: 25px;">Presiona el botón para descubrir equipos en las redes...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- VISTA: FIREWALL -->
+            <div id="firewall-view" class="view-section" style="display: none;">
+                <div class="card panel fade-in">
+                    <h2><i class="fa-solid fa-shield-virus" style="color: #fca5a5; font-size: 24px; margin-right: 10px;"></i> Firewall Inteligente Fortinet (192.168.2.254)</h2>
+                    <br>
+                    
+                    <div class="metrics" style="margin-top: 20px; grid-template-columns: 1fr 1fr;">
+                        <div class="card metric" style="background: rgba(239, 68, 68, 0.05); border-color: #ef4444;">
+                            <h3 style="color: #fca5a5;">Estado Mgmt API</h3>
+                            <div class="value" style="color: #ef4444; font-size: 22px;" id="fwStatus">
+                                <i class="fa-solid fa-circle-check"></i> Autenticado Seguro
+                            </div>
+                        </div>
+                        <div class="card metric" style="display:flex; justify-content:center; align-items:center;">
+                            <button id="btnPingFw" class="btn-outline" style="width: 100%; height: 100%; font-size: 16px; justify-content:center;">
+                                <i class="fa-solid fa-network-wired"></i> Probar Conexión API
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- MÓDULO DE GRÁFICAS ANALÍTICAS -->
+                    <div class="grid" style="margin-top: 30px; margin-bottom: 20px; gap: 20px; grid-template-columns: 2fr 1fr;">
+                        <div class="card panel fade-in" style="min-height: 350px;">
+                            <h3 style="color: var(--primary); font-size: 14px; text-transform: uppercase; font-weight: 700; margin-bottom: 15px;"><i class="fa-solid fa-earth-americas"></i> Top 5 IPs Hostiles</h3>
+                            <div style="height: 250px;"><canvas id="attacksChart"></canvas></div>
+                        </div>
+                        <div class="card panel fade-in" style="min-height: 350px;">
+                            <h3 style="color: var(--danger); font-size: 14px; text-transform: uppercase; font-weight: 700; margin-bottom: 15px;"><i class="fa-solid fa-door-open"></i> Riesgo por Puertos</h3>
+                            <div style="height: 250px;"><canvas id="portsChart"></canvas></div>
+                        </div>
+                    </div>
+
+                    <div class="panel-header" style="margin-top: 40px;">
+                        <h2><i class="fa-solid fa-crosshairs"></i> Mitigación Rápida de Amenazas</h2>
+                    </div>
+                    <div style="display: flex; gap: 15px; margin-top: 20px; align-items:center;">
+                        <input type="text" id="ipTarget" placeholder="Ej: 192.168.2.50" class="input-light">
+                        <button id="btnBlock" class="btn-danger"><i class="fa-solid fa-ban"></i> Aislar IP en Firewall</button>
+                    </div>
+                    <p id="blockMsg" style="color: #10b981; margin-top: 15px; font-size: 14px; font-weight: 600; display: none;">✅ IP inyectada a la lista negra del FortiGate (Address Group Block) exitosamente.</p>
+                </div>
+            </div>
+            
+            <!-- VISTA: FORWARD TRAFFIC -->
+            <div id="forward-view" class="view-section" style="display: none;">
+                <div class="card panel fade-in">
+                    <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                        <div>
+                            <h2><i class="fa-solid fa-route" style="color: #60a5fa; font-size: 24px; margin-right: 10px;"></i> Auditoría de Tráfico (Forward Logs)</h2>
+                            <br>
+                            <p style="color: var(--text-muted); line-height: 1.6;">
+                                Visibilidad de Cumplimiento ISO 27001 sobre el tráfico permitido (Navegación e interconexión LAN/WAN) vía Syslog.
+                            </p>
+                        </div>
+                        <div>
+                            <input type="text" id="searchForward" placeholder="🔍 Buscar por IP Origen..." class="input-light" style="padding: 10px 15px; border-radius: 6px; min-width: 250px;">
+                        </div>
+                    </div>
+                    
+                    <div class="table-container fade-in" style="margin-top: 25px;">
+                        <table id="forwardTable">
+                            <thead>
+                                <tr>
+                                    <th>Timestamp</th>
+                                    <th>IP Origen</th>
+                                    <th>Detalles del Flujo Tráfico (Destino / Reglas / Bits)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="forwardBody">
+                                <tr><td colspan="3" style="text-align:center; color: #6b7280; padding: 25px;">Esperando logs de navegación continua...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+        </main>
+    </div>
+    
+    <script src="app.js"></script>
+</body>
+</html>
