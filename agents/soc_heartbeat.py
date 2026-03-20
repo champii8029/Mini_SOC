@@ -7,8 +7,8 @@ import os
 # ==========================================
 # CONFIGURACI\u00d3N DE NOTIFICACIONES TELEGRAM
 # ==========================================
-TELEGRAM_BOT_TOKEN = "8749350265:AAFnd87ipyfLJwOd4H7iXKIUVbNjLPpDyTY"
-TELEGRAM_CHAT_ID = "925654613"
+TELEGRAM_BOT_TOKEN = ":"
+TELEGRAM_CHAT_ID = ""
 
 # Buscamos la BD en la raiz del proyecto
 DB_PATH = "soc.db" 
