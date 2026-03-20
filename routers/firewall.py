@@ -8,8 +8,8 @@ urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 router = APIRouter(prefix="/api/firewall", tags=["Firewall"])
 
 # Variables tomadas del conector Fortinet
-FORTINET_IP = "192.168.2.254"
-API_KEY = "G1h097kyhjt5cynjy6s4n36gwf1h8H"
+FORTINET_IP = ""
+API_KEY = ""
 
 def get_headers():
     return {
