@@ -6,8 +6,8 @@ import requests
 # ==========================================
 # CONFIGURACI\u00d3N DE NOTIFICACIONES TELEGRAM
 # ==========================================
-TELEGRAM_BOT_TOKEN = "8749350265:AAFnd87ipyfLJwOd4H7iXKIUVbNjLPpDyTY"
-TELEGRAM_CHAT_ID = "925654613"
+TELEGRAM_BOT_TOKEN = ":"
+TELEGRAM_CHAT_ID = ""
 
 def send_telegram_alert(title, description):
     if not TELEGRAM_BOT_TOKEN or TELEGRAM_BOT_TOKEN == "PUN_TU_TOKEN_AQUI":
